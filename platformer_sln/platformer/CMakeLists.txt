@@ -16,7 +16,7 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable (platformer "platformer.cpp" )
 
-target_link_libraries(platformer PRIVATE sfml-graphics)
+target_link_libraries(platformer PRIVATE sfml-graphics sfml-audio sfml-main sfml-network sfml-system sfml-window)
 target_compile_features(platformer PRIVATE cxx_std_20)
 
 #if(WIN32)
