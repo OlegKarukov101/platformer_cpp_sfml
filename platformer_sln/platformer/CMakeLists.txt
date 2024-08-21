@@ -14,7 +14,12 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 
-add_executable (platformer "platformer.cpp" )
+add_compile_definitions("SOURCE_ROOT=${CMAKE_SOURCE_DIR}")
+#TODO::скопировать все ассеты в папку с exe средствами CMake
+
+set(SRC "OwnGCF.h" "OwnGCF.cpp" "Control.h" "ParametrsGame.h" "Physics.h")
+
+add_executable (platformer "platformer.cpp" ${SRC})
 
 target_link_libraries(platformer PRIVATE sfml-graphics sfml-audio sfml-main sfml-network sfml-system sfml-window)
 target_compile_features(platformer PRIVATE cxx_std_20)
