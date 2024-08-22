@@ -27,17 +27,25 @@ vector<string> infmapa{     "###################################################
                             "#############....######################...#............###################........##########......###########..................#############" ,
                             "##############......###################....#.............####################...................#############################################" ,
                             "################......o################.........#####....###################################################################################" ,
-                            "##################.......................####.......................................................................########################" ,
+                            "#################........................####.......................................................................########################" ,
                             "###################...........2..................................................................################...............1###########" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
-                            "############################################################################################################################################" };
+                            "############################################################################################################################################",
+                            "############################################################################################################################################"};
 //shared_ptr<RenderWindow> window_ptr = make_shared<RenderWindow>(VideoMode(Pr::windowSizex, Pr::windowSizey), L"Платформер", Style::Default);
 vector<vector<Object*>> mapa(300, vector<Object*>(300,new Empty()));
 pair<pair<int, int>, pair<int, int>> tep1(pair<int, int>(0, 0), pair<int, int>(0, 0));
 pair<pair<int, int>, pair<int, int>> tep2(pair<int, int>(0, 0), pair<int, int>(0, 0));
 
+void DeleteMapa() {
+    for (int i = 0; i <= mapa.size(); i++) {
+        for (int j = 0; j <= mapa[i].size(); j++) {
+            delete mapa[i][j];
+        }
+    }
+}
 
 void UpdateMapa(cellka globalposmapa, Vector2f localposHero) {
 
@@ -52,7 +60,7 @@ void UpdateMapa(cellka globalposmapa, Vector2f localposHero) {
 void DrawMapa(shared_ptr<RenderWindow> window, cellka globalposmapa) {
     for (int i = 0; i <= Pr::lengthi; i++) {
         for (int j = 0; j <= Pr::lengthj; j++) {
-            if (mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->getType() == Type::Block)
+            //if (mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->getType() == Type::Block)
                 mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->Draw();
         }
     }
@@ -161,7 +169,6 @@ public:
     }
     void UpdateHero() {
 
-
         if (!isGround) {
             speed.y += Physics::gravity;
             if (speed.x != 0) {
@@ -254,6 +261,7 @@ int main()
             mapa[i][j] = new Empty(window_ptr);
             if (infmapa[i][j] == '#') {
                 mapa[i][j] = new Block(window_ptr, &texture1);
+                
             }
             if (infmapa[i][j] == 'o') {
                 hero.setGlobalPosMapa(cellka(i, j));
@@ -297,6 +305,7 @@ int main()
         {
             switch (event.type) {
             case Event::Closed:
+                DeleteMapa();
                 window_ptr->close();
                 break;
             case Event::MouseButtonReleased:
@@ -314,9 +323,6 @@ int main()
         if (Keyboard::isKeyPressed(Keyboard::D)) {
             //if(hero.isGround_()) 
             hero.AddSpeedx(Physics::Speedx);
-        }
-        if (Keyboard::isKeyPressed(Keyboard::S)) {
-            hero.AddSpeedy(2);
         }
         if (Keyboard::isKeyPressed(Keyboard::W)) {
             if (hero.isGround_())

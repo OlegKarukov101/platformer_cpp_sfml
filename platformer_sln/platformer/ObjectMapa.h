@@ -5,7 +5,7 @@
 using namespace sf;
 
  
-enum class Type{Empty, Block, Slope,Teleport};
+enum class Type{Empty, Block, Slope, Teleport};
 
 class Object {
 protected:
@@ -27,7 +27,9 @@ class Empty : public Object {
 protected:
 	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(130, 255, 255), Vector2f(0, 0));
 public:
-	Empty() {}
+	Empty() {
+
+	}
 	Empty(shared_ptr<RenderWindow> window) :Object{window, Type::Empty } {}
 	Empty(shared_ptr<RenderWindow> window, Color col) :Object{window, Type::Empty } {
 		shape.setFillColor(col);
@@ -48,7 +50,7 @@ public:
 	void setFillColor(Color col) override {
 		shape.setFillColor(col);
 	}
-	void Draw() { window->draw(shape); }
+	void Draw() override{ window->draw(shape); }
 	~Empty() {}
 };
 
@@ -81,6 +83,26 @@ public:
 	void setFillColor(Color col) override{
 		shape.setFillColor(col);
 	}
-	void Draw() { window->draw(shape); }
+	void Draw() override{ window->draw(shape); }
 	~Block() {}
+};
+class Teleport : Object {
+protected:
+	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(255, 255, 255), Vector2f(0, 0));
+	Vector2f coords;
+public:
+	Teleport(shared_ptr<RenderWindow> window,Color col,Vector2f coords) :Object{ window,Type::Teleport }
+	{
+		shape.setFillColor(col);
+		this->coords = coords;
+	}
+	void setTexture(Texture* texture) override {
+		shape.setTexture(texture);
+	}
+	void setPosition(Vector2f pos) override {
+		shape.setPosition(pos);
+	}
+	void setFillColor(Color col) override {
+		shape.setFillColor(col);
+	}
 };
