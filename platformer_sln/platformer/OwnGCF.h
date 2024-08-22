@@ -39,6 +39,8 @@ struct cellka { //cell-€чейка, клетка, а cellka чисто € придумал - клеточка, €че
 };
 RectangleShape InitialRectangleShape(Vector2f size, Color color, Vector2f position);
 RectangleShape InitialRectangleShape(Vector2f size, Color color, Vector2f position, float OutlineThikness, Color ColorOutlineThikness);
+CircleShape InitialCircleShape(float radius, Color color, Vector2f position);
+CircleShape InitialCircleShape(float radius, Color color, Vector2f position, float OutlineThikness, Color ColorOutlineThikness);
 Text InitialText(Text text, Vector2f position, Color TextColor, float OutlineThikness, Color OutlineColor);
 bool isPressButtonRec(cellka press, RectangleShape button);
 

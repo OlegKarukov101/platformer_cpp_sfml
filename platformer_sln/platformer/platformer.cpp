@@ -33,8 +33,8 @@ vector<string> infmapa{     "###################################################
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" };
-
-vector<vector<Block>> mapa(300, vector<Block>(300, Block(Color(130, 255, 255))));
+//shared_ptr<RenderWindow> window_ptr = make_shared<RenderWindow>(VideoMode(Pr::windowSizex, Pr::windowSizey), L"Платформер", Style::Default);
+vector<vector<Object*>> mapa(300, vector<Object*>(300,new Empty()));
 pair<pair<int, int>, pair<int, int>> tep1(pair<int, int>(0, 0), pair<int, int>(0, 0));
 pair<pair<int, int>, pair<int, int>> tep2(pair<int, int>(0, 0), pair<int, int>(0, 0));
 
@@ -44,7 +44,7 @@ void UpdateMapa(cellka globalposmapa, Vector2f localposHero) {
     //cout << globalposmapa.i <<"--"<< globalposmapa.j << endl;
     for (int i = 0; i <= Pr::lengthi; i++) { //9 16
         for (int j = 0; j <= Pr::lengthj; j++) {
-            mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj - 1) / 2].setPosition(Vector2f(-localposHero.x + Pr::sz * (1 + j), -localposHero.y + Pr::sz * (1 + i)));
+            mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj - 1) / 2]->setPosition(Vector2f(-localposHero.x + Pr::sz * (1 + j), -localposHero.y + Pr::sz * (1 + i)));
 
         }
     }
@@ -52,8 +52,8 @@ void UpdateMapa(cellka globalposmapa, Vector2f localposHero) {
 void DrawMapa(shared_ptr<RenderWindow> window, cellka globalposmapa) {
     for (int i = 0; i <= Pr::lengthi; i++) {
         for (int j = 0; j <= Pr::lengthj; j++) {
-            if (mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2].getFillColor() == Color(255, 255, 255))
-                (*window).draw(mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2].getShape());
+            if (mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->getType() == Type::Block)
+                mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->Draw();
         }
     }
 }
@@ -62,10 +62,14 @@ private:
     shared_ptr<RenderWindow> window;
     cellka globalposmapa = cellka(0, 0);
     bool isGround = true;
-    Vector2f size = Vector2f(Pr::sz / 2 - 5, Pr::sz / 2 - 5);
-    RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz - 10, Pr::sz - 10), Color(0, 0, 0), Vector2f(((Pr::lengthj - 1) / 2) * Pr::sz + size.x, ((Pr::lengthi) / 2) * Pr::sz + size.y), 10, Color(220, 50, 50));
+    Vector2f size = Vector2f(Pr::sz / 2-20 , Pr::sz / 2-20 );
+    RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz - 40, Pr::sz - 40), Color(0, 0, 0), Vector2f(((Pr::lengthj) / 2+0.5) * Pr::sz, ((Pr::lengthi) / 2+0.5) * Pr::sz), 1, Color(220, 50, 50));
+    Vector2f pos = shape.getPosition();
+    CircleShape pmain = InitialCircleShape(2, Color::Red, pos);
+    CircleShape pTL = InitialCircleShape(2, Color::Red, Vector2f(pos.x - size.x, pos.y - size.y)), pTR = InitialCircleShape(2, Color::Red, Vector2f(pos.x + size.x, pos.y - size.y));
+    CircleShape pBL = InitialCircleShape(2,Color::Red,Vector2f(pos.x - size.x, pos.y+size.y)), pBR = InitialCircleShape(2,Color::Red, Vector2f(pos.x+size.x,pos.y+size.y));
     Vector2f speed = Vector2f(0, 0);
-    Vector2f localpos = Vector2f(Pr::sz / 2, Pr::sz / 2);
+    Vector2f localpos = Vector2f(Pr::sz / 2, Pr::sz-size.y);
 public:
     Hero(shared_ptr<RenderWindow> window) {
         this->window = window;
@@ -101,22 +105,22 @@ public:
         Vector2f locBL = ReCountLocalPos(loc, Vector2f(-size.x, +size.y));
         Vector2f locBR = ReCountLocalPos(loc, Vector2f(+size.x, +size.y));
 
-        bool CollisionTL_T = mapa[glTL.i - 1][glTL.j].getFillColor() == Color(255, 255, 255) && (locTL.y + speed.y) < 0;
-        bool CollisionTL_L = mapa[glTL.i][glTL.j - 1].getFillColor() == Color(255, 255, 255) && (locTL.x + speed.x) < 0;
+        bool CollisionTL_T = mapa[glTL.i - 1][glTL.j]->Collision(locTL.y, speed.y, 1);
+        bool CollisionTR_T = mapa[glTR.i - 1][glTR.j]->Collision(locTR.y, speed.y, 1);
+        
+        bool CollisionTL_L = mapa[glTL.i][glTL.j - 1]->Collision(locTL.x, speed.x, 1);
+        bool CollisionBL_L = mapa[glBL.i][glBL.j - 1]->Collision(locBL.x, speed.x, 1);
+        
+        bool CollisionTR_R = mapa[glTR.i][glTR.j + 1]->Collision(locTR.x, speed.x, 0);
+        bool CollisionBR_R = mapa[glBR.i][glBR.j + 1]->Collision(locBR.x, speed.x, 0);
+        
+        bool CollisionBL_B = mapa[glBL.i + 1][glBL.j]->Collision(locBL.y, speed.y, 0);
+        bool CollisionBR_B = mapa[glBR.i + 1][glBR.j]->Collision(locBR.y, speed.y, 0);
 
-        bool CollisionTR_T = mapa[glTR.i - 1][glTR.j].getFillColor() == Color(255, 255, 255) && (locTR.y + speed.y) < 0;
-        bool CollisionTR_R = mapa[glTR.i][glTR.j + 1].getFillColor() == Color(255, 255, 255) && (locTR.x + speed.x - Pr::sz) > 0;
-
-        bool CollisionBL_B = mapa[glBL.i + 1][glBL.j].getFillColor() == Color(255, 255, 255) && (locBL.y + speed.y - Pr::sz) > 0;
-        bool CollisionBL_L = mapa[glBL.i][glBL.j - 1].getFillColor() == Color(255, 255, 255) && (locBL.x + speed.x) < 0;
-
-        bool CollisionBR_B = mapa[glBR.i + 1][glBR.j].getFillColor() == Color(255, 255, 255) && (locBR.y + speed.y - Pr::sz) > 0;
-        bool CollisionBR_R = mapa[glBR.i][glBR.j + 1].getFillColor() == Color(255, 255, 255) && (locBR.x + speed.x - Pr::sz) > 0;
-
-        bool bottomCollision = CollisionBL_B || CollisionBR_B;
         bool topCollision = CollisionTL_T || CollisionTR_T;
         bool leftCollision = CollisionTL_L || CollisionBL_L;
         bool rightCollision = CollisionTR_R || CollisionBR_R;
+        bool bottomCollision = CollisionBL_B || CollisionBR_B;
         if (bottomCollision) {
             isGround = true;
         }
@@ -208,6 +212,11 @@ public:
     void Draw() {
         if (window) {
             window->draw(shape);
+            window->draw(pmain);
+            window->draw(pTL);
+            window->draw(pTR);
+            window->draw(pBL);
+            window->draw(pBR);
         }
     }
     ~Hero() {
@@ -242,9 +251,9 @@ int main()
 
     for (int i = 0; i < infmapa.size(); i++) {
         for (int j = 0; j < infmapa[i].size(); j++) {
+            mapa[i][j] = new Empty(window_ptr);
             if (infmapa[i][j] == '#') {
-                mapa[i][j].setFillColor(Color(255, 255, 255));
-                mapa[i][j].setTexture(&texture1);
+                mapa[i][j] = new Block(window_ptr, &texture1);
             }
             if (infmapa[i][j] == 'o') {
                 hero.setGlobalPosMapa(cellka(i, j));
@@ -253,13 +262,13 @@ int main()
                 if (tep1.first == pair<int, int>(0, 0))
                     tep1.first = pair<int, int>(i, j);
                 else tep1.second = pair<int, int>(i, j);
-                mapa[i][j].setFillColor(Color(220, 50, 50));
+                mapa[i][j]->setFillColor(Color(220, 50, 50));
             }
             if (infmapa[i][j] == '2') {
                 if (tep2.second == pair<int, int>(0, 0))
                     tep2.second = pair<int, int>(i, j);
                 else tep2.first = pair<int, int>(i, j);
-                mapa[i][j].setFillColor(Color(50, 50, 220));
+                mapa[i][j]->setFillColor(Color(50, 50, 220));
             }
         }
     }

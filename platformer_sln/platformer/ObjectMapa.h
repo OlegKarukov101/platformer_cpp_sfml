@@ -10,13 +10,16 @@ enum class Type{Empty, Block, Slope,Teleport};
 class Object {
 protected:
 	Type tp;
+	shared_ptr<RenderWindow> window;
 public:
-	Object(Type tp) :tp{ tp } {}
+	Object() {}
+	Object(shared_ptr<RenderWindow> window, Type tp) :tp{ tp } { this->window = window; }
 	virtual Type getType() = 0;
 	virtual bool Collision(float loc, float speed, bool TorL) = 0;
 	virtual void setTexture(Texture* texture) = 0;
 	virtual void setPosition(Vector2f pos) = 0;
-	virtual RectangleShape getShape() = 0;
+	virtual void setFillColor(Color col) = 0;
+	virtual void Draw() = 0;
 	~Object() {}
 };
 
@@ -24,15 +27,16 @@ class Empty : public Object {
 protected:
 	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(130, 255, 255), Vector2f(0, 0));
 public:
-	Empty() :Object{ Type::Empty } {}
-	Empty(Color col) :Object{ Type::Empty } {
+	Empty() {}
+	Empty(shared_ptr<RenderWindow> window) :Object{window, Type::Empty } {}
+	Empty(shared_ptr<RenderWindow> window, Color col) :Object{window, Type::Empty } {
 		shape.setFillColor(col);
 	}
-	Empty(Texture* texture) :Object{ Type::Empty } {
+	Empty(shared_ptr<RenderWindow> window, Texture* texture) :Object{window, Type::Empty } {
 		shape.setTexture(texture);
 	}
 	Type getType() override { return tp; }
-	bool Collision(float loc, float speed, bool TorL) override {
+	bool Collision(float loc, float speed, bool checkTOPorLEFT) override {
 		return false;
 	}
 	void setTexture (Texture* texture) override {
@@ -41,9 +45,10 @@ public:
 	void setPosition(Vector2f pos) override{
 		shape.setPosition(pos);
 	}
-	RectangleShape getShape() override {
-		return shape;
+	void setFillColor(Color col) override {
+		shape.setFillColor(col);
 	}
+	void Draw() { window->draw(shape); }
 	~Empty() {}
 };
 
@@ -51,20 +56,20 @@ class Block : public Object {
 protected:
 	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(255, 255, 255), Vector2f(0, 0));
 public:
-	Block():Object{Type::Block} {}
-	Block(Color col) :Object{ Type::Block } {
+	Block(shared_ptr<RenderWindow> window):Object{window,Type::Block} {}
+	Block(shared_ptr<RenderWindow> window, Color col) :Object{window, Type::Block } {
 		shape.setFillColor(col);
 	}
-	Block(Texture* texture) :Object{ Type::Block } {
+	Block(shared_ptr<RenderWindow> window, Texture* texture) :Object{window, Type::Block } {
 		shape.setTexture(texture);
 	}
 	Type getType() override { return tp; }
 	bool Collision(float loc, float speed, bool TorL) override {
 		if (TorL) {
-			return (this->getFillColor() == Color(255, 255, 255) && (loc + speed) <= 0);
+			return (this->getType() == Type::Block && (loc + speed) <= 0);
 		}
 		else {
-			return (this->getFillColor() == Color(255, 255, 255) && (loc + speed - Pr::sz) >= 0);
+			return (this->getType() == Type::Block && (loc + speed - Pr::sz) >= 0);
 		}
 	}
 	void setTexture(Texture* texture) override{
@@ -73,14 +78,9 @@ public:
 	void setPosition(Vector2f pos) override{
 		shape.setPosition(pos);
 	}
-	RectangleShape getShape() override{
-		return shape;
-	}
-	void setFillColor(Color col) {
+	void setFillColor(Color col) override{
 		shape.setFillColor(col);
 	}
-	Color getFillColor() {
-		return shape.getFillColor();
-	}
+	void Draw() { window->draw(shape); }
 	~Block() {}
 };

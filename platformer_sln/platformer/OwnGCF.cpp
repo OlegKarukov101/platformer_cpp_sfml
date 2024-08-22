@@ -20,6 +20,22 @@ RectangleShape InitialRectangleShape(Vector2f size, Color color, Vector2f positi
     shape.setOutlineColor(ColorOutlineThikness);
     return shape;
 }
+CircleShape InitialCircleShape(float radius, Color color, Vector2f position) {
+    CircleShape shape(radius);
+    shape.setFillColor(color);
+    shape.setOrigin(radius, radius);
+    shape.setPosition(position);
+    return shape;
+}
+CircleShape InitialCircleShape(float radius, Color color, Vector2f position, float OutlineThikness, Color ColorOutlineThikness) {
+    CircleShape shape(radius);
+    shape.setFillColor(color);
+    shape.setOrigin(radius, radius);
+    shape.setPosition(position);
+    shape.setOutlineThickness(OutlineThikness);
+    shape.setOutlineColor(ColorOutlineThikness);
+    return shape;
+}
 Text InitialText(Text text, Vector2f position, Color TextColor, float OutlineThikness, Color OutlineColor) {
     Text text_(text);
     text_.setPosition(position);
