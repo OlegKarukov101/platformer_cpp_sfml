@@ -1,7 +1,11 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "OwnGCF.h"
+#include <iostream>
+#include <cmath>
+#include <string>
+#include <vector>
 #include "ParametrsGame.h"
+#include "Hero.h"
 using namespace sf;
 
  
@@ -16,10 +20,12 @@ public:
 	Object(shared_ptr<RenderWindow> window, Type tp) :tp{ tp } { this->window = window; }
 	virtual Type getType() = 0;
 	virtual bool Collision(float loc, float speed, bool TorL) = 0;
+	virtual void Enteraction(Hero* hero) = 0;
 	virtual void setTexture(Texture* texture) = 0;
 	virtual void setPosition(Vector2f pos) = 0;
 	virtual void setFillColor(Color col) = 0;
 	virtual void Draw() = 0;
+
 	~Object() {}
 };
 
@@ -41,6 +47,7 @@ public:
 	bool Collision(float loc, float speed, bool checkTOPorLEFT) override {
 		return false;
 	}
+	void Enteraction(Hero* hero) override {}
 	void setTexture (Texture* texture) override {
 		shape.setTexture(texture);
 	}
@@ -74,6 +81,7 @@ public:
 			return (this->getType() == Type::Block && (loc + speed - Pr::sz) >= 0);
 		}
 	}
+	void Enteraction(Hero* hero) override {}
 	void setTexture(Texture* texture) override{
 		shape.setTexture(texture);
 	}
@@ -89,15 +97,22 @@ public:
 class Teleport : Object {
 protected:
 	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(255, 255, 255), Vector2f(0, 0));
-	Vector2f coords;
+	cellka coords;
 public:
-	Teleport(shared_ptr<RenderWindow> window,Color col,Vector2f coords) :Object{ window,Type::Teleport }
+	Teleport(shared_ptr<RenderWindow> window,Color col,cellka coords) :Object{ window,Type::Teleport }
 	{
 		shape.setFillColor(col);
 		this->coords = coords;
 	}
+	Type getType() override { return tp; }
+	bool Collision(float loc, float speed, bool TorL) override {//does not collides
+		return false;
+	}
 	void setTexture(Texture* texture) override {
 		shape.setTexture(texture);
+	}
+	void Enteraction(Hero* hero) override{
+		hero->setGlobalPosMapa(coords);
 	}
 	void setPosition(Vector2f pos) override {
 		shape.setPosition(pos);
@@ -105,4 +120,5 @@ public:
 	void setFillColor(Color col) override {
 		shape.setFillColor(col);
 	}
+	void Draw() override { window->draw(shape); }
 };

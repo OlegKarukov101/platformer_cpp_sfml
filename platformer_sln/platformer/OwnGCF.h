@@ -30,7 +30,7 @@ private:
 static RenderWindow& window = RenderWindowSingle::Instance().Get();*/
 //extern RenderWindow window;
 struct cellka { //cell-€чейка, клетка, а cellka чисто € придумал - клеточка, €чейка.
-    int i = 0, j = 0;
+    int i = 0, j = 0;//i - y; j - x.
     cellka() {}
     cellka(int i, int j) {
         this->i = i;

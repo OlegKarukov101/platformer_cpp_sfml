@@ -3,7 +3,10 @@
 #include "Physics.h"
 #include "ParametrsGame.h"
 #include "ObjectMapa.h"
+#include "Global.h"
+#include "Hero.h"
 #include <format>
+
 
 using namespace std;
 using namespace sf;
@@ -25,17 +28,17 @@ vector<string> infmapa{     "###################################################
                             "###########.......................................................................##################..............##########......##########" ,
                             "###########.....#########################.....#####.........############..........############....................######......##############" ,
                             "#############....######################...#............###################........##########......###########..................#############" ,
-                            "##############......###################....#.............####################...................#############################################" ,
+                            "##############......###################....#.............####################...................############################################" ,
                             "################......o################.........#####....###################################################################################" ,
                             "#################........................####.......................................................................########################" ,
-                            "###################...........2..................................................................################...............1###########" ,
-                            "############################################################################################################################################" ,
+                            "###################...........2.............................................................################....................1###########" ,
+                            "###############################################.....########################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################",
                             "############################################################################################################################################"};
 //shared_ptr<RenderWindow> window_ptr = make_shared<RenderWindow>(VideoMode(Pr::windowSizex, Pr::windowSizey), L"Платформер", Style::Default);
-vector<vector<Object*>> mapa(300, vector<Object*>(300,new Empty()));
+
 pair<pair<int, int>, pair<int, int>> tep1(pair<int, int>(0, 0), pair<int, int>(0, 0));
 pair<pair<int, int>, pair<int, int>> tep2(pair<int, int>(0, 0), pair<int, int>(0, 0));
 
@@ -65,7 +68,7 @@ void DrawMapa(shared_ptr<RenderWindow> window, cellka globalposmapa) {
         }
     }
 }
-class Hero {
+/*class Hero {
 private:
     shared_ptr<RenderWindow> window;
     cellka globalposmapa = cellka(0, 0);
@@ -143,12 +146,8 @@ public:
         if (topCollision && speed.y < 0) { speed.y = 0; }
         if (isGround && speed.y > 0) { speed.y = 0; };
 
-        /*if (rightWall && (Pr::sz - (localpos.x + speed.x)) < size.x && speed.x>0) { speed.x = (Pr::sz - localpos.x) - size.x; }
-        if (leftWall && (localpos.x+speed.x) < size.x && speed.x<0) { speed.x = -localpos.x+size.x; }
-        if (topWall && (localpos.y+speed.y) < size.y && speed.y<0) { speed.y = -localpos.y+size.y; }
-        if (isGround && speed.y > 0) { speed.y = (Pr::sz-localpos.y)-size.y; };*/
 
-    }
+
     Vector2f ReCountLocalPos(Vector2f localpos, Vector2f speed) {
         int sz = Pr::sz;
         float signx = 0, signy = 0;
@@ -190,6 +189,7 @@ public:
             }
         }
         Collision();
+        mapa[globalposmapa.i][globalposmapa.j]->Enteraction(this);
         int sz = Pr::sz;
 
         /*if (speed.x>0) {
@@ -200,7 +200,7 @@ public:
         /*float signx = 0, signy = 0;
         if (speed.x != 0)  signx = (speed.x / abs(speed.x));  if(speed.y!=0) signy = (speed.y / abs(speed.y));
         localpos.x += speed.x + signx*(sz * floor((speed.x) / sz));  localpos.x = localpos.x - sz*floor(localpos.x/sz);
-        localpos.y += speed.y + signy*(sz * floor((speed.y) / sz));  localpos.y = localpos.y - sz*floor(localpos.y/sz);*/
+        localpos.y += speed.y + signy*(sz * floor((speed.y) / sz));  localpos.y = localpos.y - sz*floor(localpos.y/sz);
         globalposmapa = ReCountGlobalPos(globalposmapa, localpos, speed);
         localpos = ReCountLocalPos(localpos, speed);
 
@@ -214,7 +214,7 @@ public:
             globalposmapa.i = tep2.second.first;
             globalposmapa.j = tep2.second.second;
         }
-        //else if (tep2.second == pr) { shape.setPosition(mapa[tep2.first.first][tep2.first.second].getPosition()); }*/
+        //else if (tep2.second == pr) { shape.setPosition(mapa[tep2.first.first][tep2.first.second].getPosition()); }
     }
     void Draw() {
         if (window) {
@@ -229,7 +229,7 @@ public:
     ~Hero() {
 
     }
-};
+};*/
 
 int main()
 {
@@ -267,16 +267,30 @@ int main()
                 hero.setGlobalPosMapa(cellka(i, j));
             }
             if (infmapa[i][j] == '1') {
-                if (tep1.first == pair<int, int>(0, 0))
-                    tep1.first = pair<int, int>(i, j);
-                else tep1.second = pair<int, int>(i, j);
-                mapa[i][j]->setFillColor(Color(220, 50, 50));
+                infmapa[i] = infmapa[i].substr(0, j) + "$" + infmapa[i].substr(j+1);
+                for (int k = i;k < mapa.size();k++) {
+                    
+                    if (infmapa[k].find('1') != string::npos) {
+                        int n = infmapa[k].find('1');
+                        infmapa[k] = infmapa[k].substr(0, n) + "$" + infmapa[k].substr(n + 1);
+                        mapa[k][n] = new Teleport(window_ptr, Color(255, 0, 0), cellka(i, j));
+                        mapa[i][j] = new Teleport(window_ptr, Color(255, 0, 0), cellka(k, n));
+                        break;
+                    }
+                }
             }
             if (infmapa[i][j] == '2') {
-                if (tep2.second == pair<int, int>(0, 0))
-                    tep2.second = pair<int, int>(i, j);
-                else tep2.first = pair<int, int>(i, j);
-                mapa[i][j]->setFillColor(Color(50, 50, 220));
+                infmapa[i] = infmapa[i].substr(0, j) + "$" + infmapa[i].substr(j + 1);
+                for (int k = i;k < mapa.size();k++) {
+
+                    if (infmapa[k].find('2') != string::npos) {
+                        int n = infmapa[k].find('2');
+                        infmapa[k] = infmapa[k].substr(0, n) + "$" + infmapa[k].substr(n + 1);
+                        mapa[k][n] = new Teleport(window_ptr, Color(0, 0, 255), cellka(i, j));
+                        mapa[i][j] = new Teleport(window_ptr, Color(0, 0, 255), cellka(k, n));
+                        break;
+                    }
+                }
             }
         }
     }
