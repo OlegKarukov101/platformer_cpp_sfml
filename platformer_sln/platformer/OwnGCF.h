@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <SFML/Graphics.hpp>
+#include "SetStruct.h"
+#include "usefull_sfml.h"
 
 using namespace std;
 using namespace sf;
@@ -29,19 +31,8 @@ private:
 
 static RenderWindow& window = RenderWindowSingle::Instance().Get();*/
 //extern RenderWindow window;
-struct cellka { //cell-€чейка, клетка, а cellka чисто € придумал - клеточка, €чейка.
-    int i = 0, j = 0;//i - y; j - x.
-    cellka() {}
-    cellka(int i, int j) {
-        this->i = i;
-        this->j = j;
-    };
-};
-RectangleShape InitialRectangleShape(Vector2f size, Color color, Vector2f position);
-RectangleShape InitialRectangleShape(Vector2f size, Color color, Vector2f position, float OutlineThikness, Color ColorOutlineThikness);
-CircleShape InitialCircleShape(float radius, Color color, Vector2f position);
-CircleShape InitialCircleShape(float radius, Color color, Vector2f position, float OutlineThikness, Color ColorOutlineThikness);
-Text InitialText(Text text, Vector2f position, Color TextColor, float OutlineThikness, Color OutlineColor);
+
+
 bool isPressButtonRec(cellka press, RectangleShape button);
 
 

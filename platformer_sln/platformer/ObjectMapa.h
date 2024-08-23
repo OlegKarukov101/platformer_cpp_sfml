@@ -1,11 +1,9 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <cmath>
-#include <string>
-#include <vector>
+#include "SetStruct.h"
+#include "usefull_sfml.h"
 #include "ParametrsGame.h"
-#include "Hero.h"
+#include "Physics.h"
+#include "ComplexFields.h"
 using namespace sf;
 
  
@@ -20,7 +18,7 @@ public:
 	Object(shared_ptr<RenderWindow> window, Type tp) :tp{ tp } { this->window = window; }
 	virtual Type getType() = 0;
 	virtual bool Collision(float loc, float speed, bool TorL) = 0;
-	virtual void Enteraction(Hero* hero) = 0;
+	virtual ComplexFields Enteraction(ComplexFields* cf) = 0;
 	virtual void setTexture(Texture* texture) = 0;
 	virtual void setPosition(Vector2f pos) = 0;
 	virtual void setFillColor(Color col) = 0;
@@ -47,7 +45,7 @@ public:
 	bool Collision(float loc, float speed, bool checkTOPorLEFT) override {
 		return false;
 	}
-	void Enteraction(Hero* hero) override {}
+	ComplexFields Enteraction(ComplexFields* cf) override { return *cf; }
 	void setTexture (Texture* texture) override {
 		shape.setTexture(texture);
 	}
@@ -81,7 +79,7 @@ public:
 			return (this->getType() == Type::Block && (loc + speed - Pr::sz) >= 0);
 		}
 	}
-	void Enteraction(Hero* hero) override {}
+	ComplexFields Enteraction(ComplexFields* cf) override { return *cf; }
 	void setTexture(Texture* texture) override{
 		shape.setTexture(texture);
 	}
@@ -94,10 +92,14 @@ public:
 	void Draw() override{ window->draw(shape); }
 	~Block() {}
 };
-class Teleport : Object {
+
+
+static Clock tm;
+class Teleport : public Object {
 protected:
 	RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz, Pr::sz), Color(255, 255, 255), Vector2f(0, 0));
 	cellka coords;
+	
 public:
 	Teleport(shared_ptr<RenderWindow> window,Color col,cellka coords) :Object{ window,Type::Teleport }
 	{
@@ -111,8 +113,12 @@ public:
 	void setTexture(Texture* texture) override {
 		shape.setTexture(texture);
 	}
-	void Enteraction(Hero* hero) override{
-		hero->setGlobalPosMapa(coords);
+	ComplexFields Enteraction(ComplexFields* cf) override{
+		float time = tm.restart().asSeconds();
+		cout << time << endl;
+		if(time>=1) 
+			cf->global = coords;
+		return *cf;
 	}
 	void setPosition(Vector2f pos) override {
 		shape.setPosition(pos);

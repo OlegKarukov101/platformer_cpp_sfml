@@ -1,11 +1,10 @@
 ﻿//  TODO::скопировать все ассеты в папку с exe средствами CMake 
-#include "OwnGCF.h"
 #include "Physics.h"
 #include "ParametrsGame.h"
 #include "ObjectMapa.h"
-#include "Global.h"
 #include "Hero.h"
 #include <format>
+#include <map>
 
 
 using namespace std;
@@ -21,24 +20,25 @@ vector<string> infmapa{     "###################################################
                             "############################################################################################################################################" ,  // *  cube 100*100 
                             "############.............................................................................................###################################" ,
                             "############.............................................................................................###################################" ,
-                            "############................................1.....................................################.......########..............#############" ,
-                            "########################################........######.......#####################################.......########.....###......#############" ,
+                            "############................................1............................3........################1......########..............#############" ,
+                            "########################################........######.......#####################################.......########....2###......#############" ,
                             "########################################.....................#######################################................######.....#############" ,
                             "###########................................###..........###..2....................#########################################.......##########" ,
-                            "###########.......................................................................##################..............##########......##########" ,
-                            "###########.....#########################.....#####.........############..........############....................######......##############" ,
+                            "###########......3................................................................##################..............##########......##########" ,
+                            "###########.....#########################.....#####.........############..........############....................######1.....##############" ,
                             "#############....######################...#............###################........##########......###########..................#############" ,
-                            "##############......###################....#.............####################...................############################################" ,
+                            "##############......###################....#.............####################3.................3############################################" ,
                             "################......o################.........#####....###################################################################################" ,
-                            "#################........................####.......................................................................########################" ,
+                            "#################........................####....................2..................................................########################" ,
                             "###################...........2.............................................................################....................1###########" ,
-                            "###############################################.....########################################################################################" ,
+                            "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################",
-                            "############################################################################################################################################"};
+                            "############################################################################################################################################",
+                            "############################################################################################################################################" };
 //shared_ptr<RenderWindow> window_ptr = make_shared<RenderWindow>(VideoMode(Pr::windowSizex, Pr::windowSizey), L"Платформер", Style::Default);
-
+vector<vector<Object*>> mapa(300, vector<Object*>(300, new Empty()));
 pair<pair<int, int>, pair<int, int>> tep1(pair<int, int>(0, 0), pair<int, int>(0, 0));
 pair<pair<int, int>, pair<int, int>> tep2(pair<int, int>(0, 0), pair<int, int>(0, 0));
 
@@ -68,168 +68,6 @@ void DrawMapa(shared_ptr<RenderWindow> window, cellka globalposmapa) {
         }
     }
 }
-/*class Hero {
-private:
-    shared_ptr<RenderWindow> window;
-    cellka globalposmapa = cellka(0, 0);
-    bool isGround = true;
-    Vector2f size = Vector2f(Pr::sz / 2-20 , Pr::sz / 2-20 );
-    RectangleShape shape = InitialRectangleShape(Vector2f(Pr::sz - 40, Pr::sz - 40), Color(0, 0, 0), Vector2f(((Pr::lengthj) / 2+0.5) * Pr::sz, ((Pr::lengthi) / 2+0.5) * Pr::sz), 1, Color(220, 50, 50));
-    Vector2f pos = shape.getPosition();
-    CircleShape pmain = InitialCircleShape(2, Color::Red, pos);
-    CircleShape pTL = InitialCircleShape(2, Color::Red, Vector2f(pos.x - size.x, pos.y - size.y)), pTR = InitialCircleShape(2, Color::Red, Vector2f(pos.x + size.x, pos.y - size.y));
-    CircleShape pBL = InitialCircleShape(2,Color::Red,Vector2f(pos.x - size.x, pos.y+size.y)), pBR = InitialCircleShape(2,Color::Red, Vector2f(pos.x+size.x,pos.y+size.y));
-    Vector2f speed = Vector2f(0, 0);
-    Vector2f localpos = Vector2f(Pr::sz / 2, Pr::sz-size.y);
-public:
-    Hero(shared_ptr<RenderWindow> window) {
-        this->window = window;
-    }
-    RectangleShape getShape() { return shape; }
-    Vector2f getLocalPos() { return localpos; }
-    cellka getGlobalPosMapa() { return globalposmapa; }
-    void setSpeed(Vector2f speed) { this->speed = speed; }
-    void setGlobalPosMapa(cellka pos) {
-        globalposmapa = pos;
-    }
-    void AddSpeedx(float speedx) {
-        speed.x += speedx;
-        if (abs(speed.x) > Physics::maxSpeedx)
-            speed.x -= speedx;
-    }
-    void AddSpeedy(float speedy) {
-        speed.y += speedy;
-        if (abs(speed.y) > Physics::maxSpeedy) speed.y -= speedy;
-    }
-    bool isGround_() { return isGround; }
-    void Collision() {
-        cellka gl = globalposmapa;
-        Vector2f loc = localpos;
-        //Vector2f touchTL(localpos.x - size.x, localpos.y - size.y), touchTR(localpos.x + size.x, localpos.y - size.y);
-        //Vector2f touchBL(localpos.x - size.x, localpos.y + size.y), touchBR(localpos.x + size.x, localpos.y + size.y);
-        cellka glTL = ReCountGlobalPos(gl, loc, Vector2f(-size.x, -size.y));
-        cellka glTR = ReCountGlobalPos(gl, loc, Vector2f(+size.x, -size.y));
-        cellka glBL = ReCountGlobalPos(gl, loc, Vector2f(-size.x, +size.y));
-        cellka glBR = ReCountGlobalPos(gl, loc, Vector2f(+size.x, +size.y));
-        Vector2f locTL = ReCountLocalPos(loc, Vector2f(-size.x, -size.y));
-        Vector2f locTR = ReCountLocalPos(loc, Vector2f(+size.x, -size.y));
-        Vector2f locBL = ReCountLocalPos(loc, Vector2f(-size.x, +size.y));
-        Vector2f locBR = ReCountLocalPos(loc, Vector2f(+size.x, +size.y));
-
-        bool CollisionTL_T = mapa[glTL.i - 1][glTL.j]->Collision(locTL.y, speed.y, 1);
-        bool CollisionTR_T = mapa[glTR.i - 1][glTR.j]->Collision(locTR.y, speed.y, 1);
-        
-        bool CollisionTL_L = mapa[glTL.i][glTL.j - 1]->Collision(locTL.x, speed.x, 1);
-        bool CollisionBL_L = mapa[glBL.i][glBL.j - 1]->Collision(locBL.x, speed.x, 1);
-        
-        bool CollisionTR_R = mapa[glTR.i][glTR.j + 1]->Collision(locTR.x, speed.x, 0);
-        bool CollisionBR_R = mapa[glBR.i][glBR.j + 1]->Collision(locBR.x, speed.x, 0);
-        
-        bool CollisionBL_B = mapa[glBL.i + 1][glBL.j]->Collision(locBL.y, speed.y, 0);
-        bool CollisionBR_B = mapa[glBR.i + 1][glBR.j]->Collision(locBR.y, speed.y, 0);
-
-        bool topCollision = CollisionTL_T || CollisionTR_T;
-        bool leftCollision = CollisionTL_L || CollisionBL_L;
-        bool rightCollision = CollisionTR_R || CollisionBR_R;
-        bool bottomCollision = CollisionBL_B || CollisionBR_B;
-        if (bottomCollision) {
-            isGround = true;
-        }
-        else isGround = false;
-
-        if (rightCollision && speed.x > 0) {
-            speed.x = 0;
-        }
-        if (leftCollision && speed.x < 0) {
-            speed.x = 0;
-        }
-        if (topCollision && speed.y < 0) { speed.y = 0; }
-        if (isGround && speed.y > 0) { speed.y = 0; };
-
-
-
-    Vector2f ReCountLocalPos(Vector2f localpos, Vector2f speed) {
-        int sz = Pr::sz;
-        float signx = 0, signy = 0;
-        if (speed.x != 0)  signx = (speed.x / abs(speed.x));  if (speed.y != 0) signy = (speed.y / abs(speed.y));
-        localpos.x += speed.x + signx * (sz * floor((speed.x) / sz));  localpos.x = localpos.x - sz * floor(localpos.x / sz);
-        localpos.y += speed.y + signy * (sz * floor((speed.y) / sz));  localpos.y = localpos.y - sz * floor(localpos.y / sz);
-        return localpos;
-    }
-    cellka ReCountGlobalPos(cellka globalposmapa, Vector2f localpos, Vector2f speed) {
-        int sz = Pr::sz;
-        if (speed.x > 0) {
-            globalposmapa.j += ((int)(speed.x + localpos.x) / sz);
-        }
-        else { globalposmapa.j += ((int)(speed.x + -(sz - localpos.x)) / sz); }
-        if (speed.y > 0) { globalposmapa.i += ((int)(speed.y + localpos.y) / sz); }
-        else { globalposmapa.i += ((int)(speed.y + -(sz - localpos.y)) / sz); }
-        return globalposmapa;
-    }
-    void UpdateHero() {
-
-        if (!isGround) {
-            speed.y += Physics::gravity;
-            if (speed.x != 0) {
-                if (speed.x > 0)
-                    speed.x -= Physics::airFriction;
-
-                else if (speed.x < 0)
-                    speed.x += Physics::airFriction;
-            }
-        }
-        else {
-            if (speed.x != 0) {
-                if (speed.x > 0)
-                    speed.x -= Physics::groundFriction;
-                else if (speed.x < 0)
-                    speed.x += Physics::groundFriction;
-
-                if (abs(speed.x) < Physics::groundFriction) speed.x = 0;
-            }
-        }
-        Collision();
-        mapa[globalposmapa.i][globalposmapa.j]->Enteraction(this);
-        int sz = Pr::sz;
-
-        /*if (speed.x>0) {
-            globalposmapa.j += floor((speed.x + localpos.x) / sz); }
-        else { globalposmapa.j += floor((speed.x + -(sz-localpos.x)) / sz); }
-        if (speed.y > 0) { globalposmapa.i += floor((speed.y + localpos.y) / sz); }
-        else { globalposmapa.i += floor((speed.y + -(sz - localpos.y)) / sz); }*/
-        /*float signx = 0, signy = 0;
-        if (speed.x != 0)  signx = (speed.x / abs(speed.x));  if(speed.y!=0) signy = (speed.y / abs(speed.y));
-        localpos.x += speed.x + signx*(sz * floor((speed.x) / sz));  localpos.x = localpos.x - sz*floor(localpos.x/sz);
-        localpos.y += speed.y + signy*(sz * floor((speed.y) / sz));  localpos.y = localpos.y - sz*floor(localpos.y/sz);
-        globalposmapa = ReCountGlobalPos(globalposmapa, localpos, speed);
-        localpos = ReCountLocalPos(localpos, speed);
-
-        pair<int, int> pr(globalposmapa.i, globalposmapa.j);
-        if (tep1.first == pr) {
-            globalposmapa.i = tep1.second.first;
-            globalposmapa.j = tep1.second.second;
-        }
-        //else if (tep1.second == pr) { shape.setPosition(mapa[tep1.first.first][tep1.first.second].getPosition()); }
-        else if (tep2.first == pr) {
-            globalposmapa.i = tep2.second.first;
-            globalposmapa.j = tep2.second.second;
-        }
-        //else if (tep2.second == pr) { shape.setPosition(mapa[tep2.first.first][tep2.first.second].getPosition()); }
-    }
-    void Draw() {
-        if (window) {
-            window->draw(shape);
-            window->draw(pmain);
-            window->draw(pTL);
-            window->draw(pTR);
-            window->draw(pBL);
-            window->draw(pBR);
-        }
-    }
-    ~Hero() {
-
-    }
-};*/
 
 int main()
 {
@@ -255,45 +93,49 @@ int main()
     texture1.setSmooth(true);
 
 
+    map<char,vector<cellka>> tp{
+        pair<char,vector<cellka>> {'1',vector<cellka>()},{'2',vector<cellka>()},{'3',vector<cellka>()}
+    };
+    string stp = "123";
+    map<char, Color> coltp {
+        pair<char,Color> {'1',Color(220,100,100)},{'2',Color(100,100,220)},{'3',Color(100,220,100)}
+    };
 
     for (int i = 0; i < infmapa.size(); i++) {
         for (int j = 0; j < infmapa[i].size(); j++) {
             mapa[i][j] = new Empty(window_ptr);
-            if (infmapa[i][j] == '#') {
+            char p = infmapa[i][j];
+            if (p == '#') {
                 mapa[i][j] = new Block(window_ptr, &texture1);
                 
             }
-            if (infmapa[i][j] == 'o') {
+            if (p == 'o') {
                 hero.setGlobalPosMapa(cellka(i, j));
             }
-            if (infmapa[i][j] == '1') {
-                infmapa[i] = infmapa[i].substr(0, j) + "$" + infmapa[i].substr(j+1);
-                for (int k = i;k < mapa.size();k++) {
-                    
-                    if (infmapa[k].find('1') != string::npos) {
-                        int n = infmapa[k].find('1');
-                        infmapa[k] = infmapa[k].substr(0, n) + "$" + infmapa[k].substr(n + 1);
-                        mapa[k][n] = new Teleport(window_ptr, Color(255, 0, 0), cellka(i, j));
-                        mapa[i][j] = new Teleport(window_ptr, Color(255, 0, 0), cellka(k, n));
-                        break;
-                    }
+            if (stp.find(p) != string::npos) {
+                cout << p << ":" << endl;
+                vector<cellka> tep = tp[p];
+                if (tep.size() > 0) {
+                    mapa[tep.back().i][tep.back().j] = new Teleport(window_ptr, coltp[p], cellka(i, j));
+                    cout << format("[{}][{}]", tep.back().i, tep.back().j) << " = " << i << "," << j << endl;
                 }
-            }
-            if (infmapa[i][j] == '2') {
-                infmapa[i] = infmapa[i].substr(0, j) + "$" + infmapa[i].substr(j + 1);
-                for (int k = i;k < mapa.size();k++) {
-
-                    if (infmapa[k].find('2') != string::npos) {
-                        int n = infmapa[k].find('2');
-                        infmapa[k] = infmapa[k].substr(0, n) + "$" + infmapa[k].substr(n + 1);
-                        mapa[k][n] = new Teleport(window_ptr, Color(0, 0, 255), cellka(i, j));
-                        mapa[i][j] = new Teleport(window_ptr, Color(0, 0, 255), cellka(k, n));
-                        break;
-                    }
-                }
+                tp[p].push_back(cellka(i, j));
+                cout << format("push_back({},{})", i,j)<< endl;
             }
         }
     }
+    cout << endl;
+    for (const auto& el : tp) {
+        mapa[el.second.back().i][el.second.back().j] = new Teleport(window_ptr, coltp[el.first], el.second.front());
+        cout << format("[{}][{}]", el.second.back().i, el.second.back().j )<< " = " << el.second.front().i << "," << el.second.front().j << endl;
+        cout << el.first << endl;
+        for (int i = 0; i < el.second.size(); i++) {
+            cout << el.second[i].i << "-" << el.second[i].j << endl;
+        }
+        cout << endl;
+    }
+
+
 
 
 
@@ -342,7 +184,8 @@ int main()
             if (hero.isGround_())
                 hero.AddSpeedy(-Physics::jumpSpeed);
         }
-        hero.UpdateHero();
+        cellka glhero = hero.getGlobalPosMapa();
+        hero.UpdateHero(mapa[glhero.i][glhero.j],mapa[glhero.i - 1][glhero.j], mapa[glhero.i][glhero.j-1], mapa[glhero.i][glhero.j+1], mapa[glhero.i+1][glhero.j]);
         UpdateMapa(hero.getGlobalPosMapa(), hero.getLocalPos());
         window_ptr->clear();
         window_ptr->draw(fon);

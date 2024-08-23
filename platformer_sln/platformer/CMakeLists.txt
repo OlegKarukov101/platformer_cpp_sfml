@@ -17,9 +17,9 @@ FetchContent_MakeAvailable(SFML)
 add_compile_definitions("SOURCE_ROOT=${CMAKE_SOURCE_DIR}")
 #TODO::скопировать все ассеты в папку с exe средствами CMake
 
-set(SRC "OwnGCF.h" "OwnGCF.cpp" "Control.h" "ParametrsGame.h" "Physics.h")
+set(SRC "OwnGCF.h" "OwnGCF.cpp" "Control.h" "ParametrsGame.h" "Physics.h"  "Hero.h" "Hero.cpp" "ObjectMapa.h"  )
 
-add_executable (platformer "platformer.cpp" ${SRC})
+add_executable (platformer "platformer.cpp" ${SRC} "SetStruct.h" "usefull_sfml.cpp" "ComplexFields.h")
 
 target_link_libraries(platformer PRIVATE sfml-graphics sfml-audio sfml-main sfml-network sfml-system sfml-window)
 target_compile_features(platformer PRIVATE cxx_std_20)
