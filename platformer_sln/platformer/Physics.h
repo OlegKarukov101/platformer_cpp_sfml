@@ -22,4 +22,5 @@ namespace Physics {
 	const float jumpSpeed = 14;
 	const float gravity = 0.4f;
 	const float maxSpeedy = 16;
+
 }

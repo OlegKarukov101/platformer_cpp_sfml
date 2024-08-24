@@ -88,6 +88,12 @@ using namespace sf;
         else { globalposmapa.i += ((int)(speed.y + -(sz - localpos.y)) / sz); }
         return globalposmapa;
     }
+
+#pragma region direction
+    bool Hero::GetDirection() { return _direction; }
+    void Hero::SetDirection(bool value) { _direction = value; }
+#pragma endregion
+
     void Hero::UpdateHero(Object* mapaMain, Object* mapaT, Object* mapaL, Object* mapaR, Object* mapaB) {
 
         if (!isGround) {
