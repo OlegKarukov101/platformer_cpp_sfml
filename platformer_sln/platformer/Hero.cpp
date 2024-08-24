@@ -1,7 +1,6 @@
 #pragma once
 #include "Hero.h"
-using namespace std;
-using namespace sf;
+
 
 
     Hero::Hero(shared_ptr<RenderWindow> window) {
@@ -73,24 +72,7 @@ using namespace sf;
        
 
     }
-    Vector2f Hero::ReCountLocalPos(Vector2f localpos, Vector2f speed) {
-        int sz = Pr::sz;
-        float signx = 0, signy = 0;
-        if (speed.x != 0)  signx = (speed.x / abs(speed.x));  if (speed.y != 0) signy = (speed.y / abs(speed.y));
-        localpos.x += speed.x + signx * (sz * floor((speed.x) / sz));  localpos.x = localpos.x - sz * floor(localpos.x / sz);
-        localpos.y += speed.y + signy * (sz * floor((speed.y) / sz));  localpos.y = localpos.y - sz * floor(localpos.y / sz);
-        return localpos;
-    }
-    cellka Hero::ReCountGlobalPos(cellka globalposmapa, Vector2f localpos, Vector2f speed) {
-        int sz = Pr::sz;
-        if (speed.x > 0) {
-            globalposmapa.j += ((int)(speed.x + localpos.x) / sz);
-        }
-        else { globalposmapa.j += ((int)(speed.x + -(sz - localpos.x)) / sz); }
-        if (speed.y > 0) { globalposmapa.i += ((int)(speed.y + localpos.y) / sz); }
-        else { globalposmapa.i += ((int)(speed.y + -(sz - localpos.y)) / sz); }
-        return globalposmapa;
-    }
+
 
 #pragma region direction
     bool Hero::GetDirection() { return _direction; }
@@ -122,10 +104,8 @@ using namespace sf;
         Collision(mapaT,mapaL,mapaR,mapaB);
         cf = mapaMain->Enteraction(&cf);
         
-        cf.global = ReCountGlobalPos(cf.global, cf.local, cf.speed);
-        cf.local = ReCountLocalPos(cf.local, cf.speed);
+        cf.Move();
 
-        
         
     }
     void Hero::Draw() {

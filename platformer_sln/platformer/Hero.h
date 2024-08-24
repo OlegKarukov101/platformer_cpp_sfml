@@ -34,8 +34,8 @@ public:
 	Vector2f getPos();
 	void SetDirection(bool value);
 	void Collision(Object* mapaT, Object* mapaL, Object* mapaR, Object* mapaB);
-	Vector2f ReCountLocalPos(Vector2f localpos, Vector2f speed);
-	cellka ReCountGlobalPos(cellka globalposmapa, Vector2f localpos, Vector2f speed);
+	//Vector2f ReCountLocalPos(Vector2f localpos, Vector2f speed);
+	//cellka ReCountGlobalPos(cellka globalposmapa, Vector2f localpos, Vector2f speed);
 	void UpdateHero(Object* mapaMain, Object* mapaT, Object* mapaL, Object* mapaR, Object* mapaB);
 	void Draw();
 	~Hero();
