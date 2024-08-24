@@ -153,7 +153,7 @@ int main()
     int frame = 0;
     while (window_ptr->isOpen())
     {
-        Bullet::MoveBullets();
+        
         frame %= 100000;
         frame++;
         time = clock.getElapsedTime().asSeconds();
@@ -188,8 +188,9 @@ int main()
                 hero.AddSpeedy(-Physics::jumpSpeed);
         }
         if (Keyboard::isKeyPressed(Keyboard::Q)) {
-            Bullet h = Bullet(window_ptr,Color(255,140,0),hero.getLocalPos(), hero.GetDirection());
+            Bullet* h = new Bullet(window_ptr,Color(255,140,0),hero.getPos(), hero.GetDirection());
         }
+        
         cellka glhero = hero.getGlobalPosMapa();
         hero.UpdateHero(mapa[glhero.i][glhero.j],mapa[glhero.i - 1][glhero.j], mapa[glhero.i][glhero.j-1], mapa[glhero.i][glhero.j+1], mapa[glhero.i+1][glhero.j]);
         UpdateMapa(hero.getGlobalPosMapa(), hero.getLocalPos());
@@ -197,6 +198,7 @@ int main()
         window_ptr->draw(fon);
         DrawMapa(window_ptr, hero.getGlobalPosMapa());
         hero.Draw();
+		Bullet::MoveBullets();
         window_ptr->draw(contour);
         window_ptr->display();
     }

@@ -14,6 +14,9 @@ using namespace sf;
     void Hero::setGlobalPosMapa(cellka pos) {
         cf.global = pos;
     }
+    Vector2f Hero::getPos() {
+        return shape.getPosition();
+    }
     void Hero::AddSpeedx(float speedx) {
         cf.speed.x += speedx;
         if (abs(cf.speed.x) > Physics::maxSpeedx)

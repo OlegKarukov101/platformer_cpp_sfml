@@ -15,7 +15,7 @@ protected:
     bool direction;
     CircleShape bul;
     static vector<Bullet*> bullets;
-
+    shared_ptr<RenderWindow> window;
 public:
 #pragma region Working with static
     static void MoveBullets() {
@@ -35,17 +35,21 @@ public:
         this->direction = direction;
         bul = InitialCircleShape(bulletRadius, col, heroPos);  // Assuming InitialCircleShape is defined elsewhere
         bullets.push_back(this);
+        this->window = window;
     }
 
     void Move() {
         bul.move(Vector2f((direction ? bulletSpeed : -bulletSpeed), 0));
+        Draw();
     }
 
     void Destroy() {
         DeleteBullet(this);
-        // Do not use delete this; unless you are absolutely sure it was allocated with new
+        delete(this);
     }
-
+    void Draw() {
+        window->draw(bul);
+    }
     ~Bullet() {
         // Destructor will be called when the object is destroyed, so manage your resources here if necessary
     }

@@ -31,6 +31,7 @@ public:
 	void AddSpeedy(float speedy);
 	bool isGround_();
 	bool GetDirection();
+	Vector2f getPos();
 	void SetDirection(bool value);
 	void Collision(Object* mapaT, Object* mapaL, Object* mapaR, Object* mapaB);
 	Vector2f ReCountLocalPos(Vector2f localpos, Vector2f speed);
