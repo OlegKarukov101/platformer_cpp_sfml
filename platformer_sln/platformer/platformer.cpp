@@ -5,7 +5,7 @@
 #include "Hero.h"
 #include <format>
 #include <map>
-#include "bullet.h";
+//#include "bullet.h";
 
 using namespace std;
 using namespace sf;
@@ -13,7 +13,7 @@ using namespace sf;
 #define STRING(x) #x
 #define XSTRING(x) STRING(x)
 static const string SOURCE_DIR_PATH = XSTRING(SOURCE_ROOT);
-vector<Bullet*> Bullet::bullets;
+//vector<Bullet*> Bullet::bullets;
 vector<string> infmapa{     "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
@@ -51,16 +51,17 @@ void DeleteMapa() {
 }
 
 void UpdateMapa(cellka globalposmapa, Vector2f localposHero) {
-
+    cout << "Update :" << globalposmapa.i << "__" << globalposmapa.j << endl;
     //cout << globalposmapa.i <<"--"<< globalposmapa.j << endl;
     for (int i = 0; i <= Pr::lengthi; i++) { //9 16
         for (int j = 0; j <= Pr::lengthj; j++) {
-            mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj - 1) / 2]->setPosition(Vector2f(-localposHero.x + Pr::sz * (1 + j), -localposHero.y + Pr::sz * (1 + i)));
+            mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->setPosition(Vector2f(-localposHero.x + Pr::sz * (1 + j), -localposHero.y + Pr::sz * (1 + i)));
 
         }
     }
 }
 void DrawMapa(shared_ptr<RenderWindow> window, cellka globalposmapa) {
+    cout << "Draw   :" << globalposmapa.i << "__" << globalposmapa.j << endl;
     for (int i = 0; i <= Pr::lengthi; i++) {
         for (int j = 0; j <= Pr::lengthj; j++) {
             //if (mapa[i + globalposmapa.i - (Pr::lengthi) / 2][j + globalposmapa.j - (Pr::lengthj) / 2]->getType() == Type::Block)
@@ -149,7 +150,7 @@ int main()
     //main capusta
     Clock clock;
     float time = (float)clock.getElapsedTime().asSeconds();
-
+    
     int frame = 0;
     while (window_ptr->isOpen())
     {
@@ -187,18 +188,19 @@ int main()
             if (hero.isGround_())
                 hero.AddSpeedy(-Physics::jumpSpeed);
         }
-        if (Keyboard::isKeyPressed(Keyboard::Q)) {
-            Bullet* h = new Bullet(window_ptr,Color(255,140,0),hero.getPos(), hero.GetDirection());
-        }
+        //if (Keyboard::isKeyPressed(Keyboard::Q)) {
+        //    Bullet* h = new Bullet(window_ptr,Color(255,140,0),hero.getPos(), hero.GetDirection());
+        //}
         
         cellka glhero = hero.getGlobalPosMapa();
         hero.UpdateHero(mapa[glhero.i][glhero.j],mapa[glhero.i - 1][glhero.j], mapa[glhero.i][glhero.j-1], mapa[glhero.i][glhero.j+1], mapa[glhero.i+1][glhero.j]);
         UpdateMapa(hero.getGlobalPosMapa(), hero.getLocalPos());
         window_ptr->clear();
         window_ptr->draw(fon);
+        //cout << hero.getLocalPos().x << "__"<<hero.getLocalPos().y << endl;
         DrawMapa(window_ptr, hero.getGlobalPosMapa());
         hero.Draw();
-		Bullet::MoveBullets();
+		//Bullet::MoveBullets();
         window_ptr->draw(contour);
         window_ptr->display();
     }

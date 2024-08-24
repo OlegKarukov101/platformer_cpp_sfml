@@ -117,7 +117,7 @@ public:
 		float time = tm.restart().asSeconds();
 		cout << time << endl;
 		if(time>=1) 
-			cf->global = coords;
+			cf->pos.global = coords;
 		return *cf;
 	}
 	void setPosition(Vector2f pos) override {
