@@ -5,7 +5,7 @@
 #include "Hero.h"
 #include <format>
 #include <map>
-
+#include "bullet.h";
 
 using namespace std;
 using namespace sf;
@@ -13,7 +13,7 @@ using namespace sf;
 #define STRING(x) #x
 #define XSTRING(x) STRING(x)
 static const string SOURCE_DIR_PATH = XSTRING(SOURCE_ROOT);
-
+vector<Bullet> bullets;
 vector<string> infmapa{     "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
                             "############################################################################################################################################" ,
@@ -153,6 +153,7 @@ int main()
     int frame = 0;
     while (window_ptr->isOpen())
     {
+        
         frame %= 100000;
         frame++;
         time = clock.getElapsedTime().asSeconds();
@@ -175,14 +176,19 @@ int main()
         if (Keyboard::isKeyPressed(Keyboard::A)) {
             //if(hero.isGround_()) 
             hero.AddSpeedx(-Physics::Speedx);
+            hero.SetDirection(0);
         }
         if (Keyboard::isKeyPressed(Keyboard::D)) {
             //if(hero.isGround_()) 
             hero.AddSpeedx(Physics::Speedx);
+            hero.SetDirection(1);
         }
         if (Keyboard::isKeyPressed(Keyboard::W)) {
             if (hero.isGround_())
                 hero.AddSpeedy(-Physics::jumpSpeed);
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Q)) {
+            bullets.push_back(Bullet(window_ptr,Color(255,140,10),hero.getLocalPos(), hero.GetDirection()));
         }
         cellka glhero = hero.getGlobalPosMapa();
         hero.UpdateHero(mapa[glhero.i][glhero.j],mapa[glhero.i - 1][glhero.j], mapa[glhero.i][glhero.j-1], mapa[glhero.i][glhero.j+1], mapa[glhero.i+1][glhero.j]);
@@ -191,7 +197,12 @@ int main()
         window_ptr->draw(fon);
         DrawMapa(window_ptr, hero.getGlobalPosMapa());
         hero.Draw();
-        window_ptr->draw(contour);
+        for (Bullet bul : bullets) {
+            bul.Move();
+        }
+        for (Bullet bul:bullets) { bul.Draw(); }
+        
+        //window_ptr->draw(contour);
         window_ptr->display();
     }
     return 0;
